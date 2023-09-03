@@ -1,6 +1,5 @@
 # This file is used to ignore files which are generated
-# ----------------------------------------------------------------------------
-MakefileMakefile.debugMakefile.Release
+# ----------------------------------------------------------------------------*.Release*.DebugMakefile*
 *~
 *.autosave
 *.a
