@@ -8,7 +8,7 @@ class Matrix
 {
 private:
     int matrix_size = 5;
-    number matrix[5][5];
+    number matrix[10][10];
 public:
     void printMatrix();
     void setSize();
