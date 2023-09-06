@@ -24,7 +24,7 @@ void Application::exec()
         {
             case(1):
                 matrix.setSize();
-                matrix.setMatrixValues();
+                matrix.setValues();
                 break;
             case(2):
                 number** tmp_matrix;
@@ -36,16 +36,16 @@ void Application::exec()
                 for (int i = 0; i < matrix.getSize(); ++i) {
                     tmp_matrix[i] = new number[matrix.getSize()];
                 }
-                matrix.copyMatrix(tmp_matrix);
+                matrix.copy(tmp_matrix);
 
                 //вызываем метод для расчета определителя
-                det = matrix.calculateDet(tmp_matrix, matrix.getSize());
+                det = matrix.det(tmp_matrix, matrix.getSize());
 
                 std::cout << "Determinant = " << det <<std::endl;
 
                 break;
             case(3):
-                matrix.transposeMatrix();
+                matrix.transpose();
                 break;
             case(4):
                 int rank;
@@ -56,14 +56,14 @@ void Application::exec()
                 for (int i = 0; i < matrix.getSize(); ++i) {
                     tmp_matrix[i] = new number[matrix.getSize()];
                 }
-                matrix.copyMatrix(tmp_matrix);
+                matrix.copy(tmp_matrix);
 
-                rank = matrix.calculateRank();
+                rank = matrix.rank();
 
                 std::cout << "Rank = " << rank << std::endl;
                 break;
             case(5):
-                matrix.printMatrix();
+                matrix.print();
                 break;
             case(6):
                 quit = true;

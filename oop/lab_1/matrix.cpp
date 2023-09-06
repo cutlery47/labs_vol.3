@@ -17,7 +17,7 @@ Matrix::Matrix()
 }
 
 //данный метод выводит матрицу на экран
-void Matrix::printMatrix()
+void Matrix::print()
 {
     for (int i = 0; i < matrix_size; ++i)
     {
@@ -47,7 +47,7 @@ int Matrix::getSize()
 }
 
 //ввод значений в матрицу
-void Matrix::setMatrixValues() {
+void Matrix::setValues() {
     std::cout << "Please, enter the matrix values (from left to right)\n";
     for (int i = 0; i < matrix_size; ++i)
     {
@@ -60,7 +60,7 @@ void Matrix::setMatrixValues() {
 }
 
 //транспонирование матрицы
-void Matrix::transposeMatrix()
+void Matrix::transpose()
 {
     number temp = 0;
 
@@ -76,7 +76,7 @@ void Matrix::transposeMatrix()
 }
 
 //копирование значений одной матрицы в другую
-void Matrix::copyMatrix(number** tmp_matrix)
+void Matrix::copy(number** tmp_matrix)
 {
     for (int i = 0; i < matrix_size; ++i)
     {
@@ -106,10 +106,11 @@ void Matrix::getEditedMatrix(number** matrix, number** new_matrix, int row, int 
 }
 
 //расчет определителя разложением по первому столбцу
-number Matrix::calculateDet(number** cur_matrix, int size)
+number Matrix::det(number** cur_matrix, int size)
 {
     //возвращаемое значение
-    number det = 0;
+    number d = 0;
+
     int k = 1;
 
     //создаем массив для следующей итерации
@@ -119,25 +120,25 @@ number Matrix::calculateDet(number** cur_matrix, int size)
 
     if (size == 1)
     {
-        det = cur_matrix[0][0];
-        return det;
+        d = cur_matrix[0][0];
+        return d;
     }
     else if (size == 2)
     {
-        det = cur_matrix[0][0] * cur_matrix[1][1] - cur_matrix[0][1] * cur_matrix[1][0];
-        return det;
+        d = cur_matrix[0][0] * cur_matrix[1][1] - cur_matrix[0][1] * cur_matrix[1][0];
+        return d;
     }
     else
     {
         for (int i = 0; i < size; ++i)
         {
             getEditedMatrix(cur_matrix, edited_matrix, i, 0, size - 1);
-            det += k * cur_matrix[i][0] * calculateDet(edited_matrix, size - 1);
+            d += k * cur_matrix[i][0] * det(edited_matrix, size - 1);
             k = -k;
         }
     }
 
-    return det;
+    return d;
 }
 
 number** vectorToArray(std::vector<std::vector<number>> vect) {
@@ -157,7 +158,7 @@ number** vectorToArray(std::vector<std::vector<number>> vect) {
     return mat;
 }
 
-int Matrix::calculateRank() {
+int Matrix::rank() {
     int rank = 1;
     int q = 1;
 
@@ -181,7 +182,7 @@ int Matrix::calculateRank() {
                 int arr_sz = smth.size();
                 number** smth_arr = vectorToArray(smth);
 
-                if (calculateDet(smth_arr, arr_sz) != 0) {
+                if (det(smth_arr, arr_sz) != 0) {
                     rank = q;
                 }
 
@@ -191,8 +192,10 @@ int Matrix::calculateRank() {
         ++q;
     }
 
-    return rank;
+    return rank + 1;
 
 }
+
+
 
 
