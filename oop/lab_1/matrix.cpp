@@ -16,6 +16,16 @@ Matrix::Matrix()
     }
 }
 
+//удаление массива, выделенного в куче
+void Matrix::clear(number** mat, int size)
+{
+    for (int i = 0; i < size; ++i) {
+        delete[] mat[i];
+    }
+
+    delete[] mat;
+}
+
 //данный метод выводит матрицу на экран
 void Matrix::print()
 {
@@ -34,8 +44,7 @@ void Matrix::setSize()
 {
     std::cout << "Please, set the matrix size... (max = 10)\n";
 
-    do
-    {
+    do {
         std::cin >> matrix_size;
     } while(matrix_size > 10 or matrix_size < 1);
 }
@@ -47,7 +56,12 @@ int Matrix::getSize()
 }
 
 //ввод значений в матрицу
-void Matrix::setValues() {
+void Matrix::setValues()
+{
+    //матрица обновилась - сбросились значения ранга и определителя
+    det = 228;
+    rank = -1;
+
     std::cout << "Please, enter the matrix values (from left to right)\n";
     for (int i = 0; i < matrix_size; ++i)
     {
@@ -76,19 +90,28 @@ void Matrix::transpose()
 }
 
 //копирование значений одной матрицы в другую
-void Matrix::copy(number** tmp_matrix)
+void Matrix::copy(number** mat)
 {
     for (int i = 0; i < matrix_size; ++i)
     {
         for (int j = 0; j < matrix_size; ++j)
         {
-            tmp_matrix[i][j] = matrix[i][j];
+            mat[i][j] = matrix[i][j];
         }
     }
 }
 
+number** Matrix::allocate(int size)
+{
+    number** mat = new number* [size];
+    for (int i = 0; i < size; ++i)
+        mat[i] = new number[size];
+
+    return mat;
+}
+
 //получение матрицы без i столбца и j строки
-void Matrix::getEditedMatrix(number** matrix, number** new_matrix, int row, int column, int size)
+number** Matrix::getMinor(number** og_mat, number** mat, int row, int column, int size)
 {
     int offset_i = 0;
     int offset_j = 0;
@@ -100,102 +123,87 @@ void Matrix::getEditedMatrix(number** matrix, number** new_matrix, int row, int 
         {
             if (j == column)
                 offset_j = 1;
-            new_matrix[i][j] = matrix[i + offset_i][j + offset_j];
+            mat[i][j] = og_mat[i + offset_i][j + offset_j];
         }
-    }
-}
-
-//расчет определителя разложением по первому столбцу
-number Matrix::det(number** cur_matrix, int size)
-{
-    //возвращаемое значение
-    number d = 0;
-
-    int k = 1;
-
-    //создаем массив для следующей итерации
-    number** edited_matrix = new number* [size - 1];
-    for (int i = 0; i < size - 1; ++i)
-        edited_matrix[i] = new number[size - 1];
-
-    if (size == 1)
-    {
-        d = cur_matrix[0][0];
-        return d;
-    }
-    else if (size == 2)
-    {
-        d = cur_matrix[0][0] * cur_matrix[1][1] - cur_matrix[0][1] * cur_matrix[1][0];
-        return d;
-    }
-    else
-    {
-        for (int i = 0; i < size; ++i)
-        {
-            getEditedMatrix(cur_matrix, edited_matrix, i, 0, size - 1);
-            d += k * cur_matrix[i][0] * det(edited_matrix, size - 1);
-            k = -k;
-        }
-    }
-
-    return d;
-}
-
-number** vectorToArray(std::vector<std::vector<number>> vect) {
-    int size = vect.size();
-
-    number** mat = new number* [size];
-    for (int i = 0; i < size; ++i) {
-        mat[i] = new number[size];
-    }
-
-    for (int i = 0; i < size; ++i) {
-        for (int j = 0; j < size; ++j) {
-            mat[i][j] = vect[i][j];
-        }
+        offset_j = 0;
     }
 
     return mat;
 }
 
-int Matrix::rank() {
-    int rank = 1;
-    int q = 1;
-
-    while (q < matrix_size) {
-        std::vector<number> standart(1,1);
-        std::vector<std::vector<number>> smth;
-
-        standart.resize(q);
-        for (int w = 0; w < q; ++w) {
-            smth.push_back(standart);
-        }
-
-        for(int a = 0; a < (matrix_size - (q - 1)); a++){
-            for(int b = 0; b < (matrix_size - (q - 1)); b++){
-                for(int c = 0; c < q; c++){
-                    for(int d = 0; d < q; d++){
-                        smth[c][d] = matrix[a+c][b+d];
-                    }
-                }
-
-                int arr_sz = smth.size();
-                number** smth_arr = vectorToArray(smth);
-
-                if (det(smth_arr, arr_sz) != 0) {
-                    rank = q;
-                }
-
-            }
-        }
-
-        ++q;
-    }
-
-    return rank + 1;
-
+number Matrix::getDet() {
+    return det;
 }
 
+int Matrix::getRank() {
+    return rank;
+}
 
+void Matrix::setDet(number**mat, int size) {
+    det = calcDet(mat, size);
+}
 
+void Matrix::setRank(number**mat, int size) {
+    rank = calcRank(mat, size);
+}
 
+//расчет определителя разложением по первому столбцу
+number Matrix::calcDet(number** mat, int size)
+{
+    //возвращаемое значение
+    number d = 0;
+
+    //знак
+    int k = 1;
+
+    //создаем массив для следующей итерации
+    number** minor = allocate(size - 1);
+
+    if (size == 1)
+    {
+        d = mat[0][0];
+    }
+    else if (size == 2)
+    {
+        d = mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
+    }
+    else
+    {
+        for (int col = 0; col < size; ++col)
+        {
+            minor = getMinor(mat, minor, col, 0, size - 1);
+            d += k * mat[col][0] * calcDet(minor, size - 1);
+            k = -k;
+
+        }
+    }
+
+    //очищаем память после минора
+    clear(minor, size - 1);
+
+    return d;
+}
+
+int Matrix::calcRank(number** mat, int size) {
+    int rnk = 0;
+
+    //ранг матрицы - размер наибольшего ненулевого минора
+    number d = calcDet(mat, size);
+    if (d != 0) {
+        return size;
+    }
+
+    //создаем массив для следующей итерации
+    number** minor = allocate(size - 1);
+
+    for (int row = 0; row < size; ++row) {
+        for (int col = 0; col < size; ++col) {
+            minor = getMinor(mat, minor, row, col, size - 1);
+            //находим максимальный ранг
+            rnk = std::max(rnk, calcRank(minor, size - 1));
+        }
+    }
+
+    clear(minor, size - 1);
+    return rnk;
+}

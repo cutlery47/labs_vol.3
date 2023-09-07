@@ -7,25 +7,40 @@
 class Matrix
 {
 private:
-    int matrix_size = 5;
     number matrix[10][10];
 
+    //стандартные атрибуты объектов
+    int matrix_size = 5;
+    int rank = -1;
+    number det = 228;
 
-    void swapRows(number** tmp_matrix, int row_1, int row_2, int size);
-    void getEditedMatrix(number** matrix, number** new_matrix, int row, int column, int size);
+    //приватные утилиты матрицы
+    number** getMinor(number** matrix, number** mat, int row, int column, int size);
 
 public:
     Matrix();
 
+    //утилиты матрицы
     void print();
+    void transpose();
+    void copy(number** mat);
+    void clear(number** mat, int size);
+    number** allocate(int size);
+
+    //расчеты
+    int calcRank(number** mat, int size);
+    number calcDet(number** mat, int size);
+
+    //сеттеры
     void setSize();
     void setValues();
-    void transpose();
-    void copy(number** tmp_matrix);
+    void setRank(number**mat, int size);
+    void setDet(number**mat, int size);
 
-    number det(number** cur_matrix, int size);
+    //геттеры
     int getSize();
-    int rank();
+    int getRank();
+    number getDet();
 };
 
 #endif // MATRIX_H
