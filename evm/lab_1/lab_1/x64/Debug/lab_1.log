@@ -1,0 +1,6 @@
+﻿  lab_1.cpp
+C:\Programming\c+-\leti_3_sem\evm\lab_1\lab_1\lab_1.cpp(48,28): warning C4474: 'printf' : too many arguments passed for format string
+C:\Programming\c+-\leti_3_sem\evm\lab_1\lab_1\lab_1.cpp(48,28): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
+C:\Programming\c+-\leti_3_sem\evm\lab_1\lab_1\lab_1.cpp(67,28): warning C4474: 'printf' : too many arguments passed for format string
+C:\Programming\c+-\leti_3_sem\evm\lab_1\lab_1\lab_1.cpp(67,28): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
+  lab_1.vcxproj -> C:\Programming\c+-\leti_3_sem\evm\lab_1\x64\Debug\lab_1.exe
