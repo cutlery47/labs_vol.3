@@ -179,7 +179,7 @@ int main() {
 	textcolor(WHITE);
 	clrscr();
 
-	cprintf("Enter a short int (-32768; 16384): ");
+	cprintf("Enter a short int (-16384; 16383): ");
 
 	cscanf("%d", &bsh.s);
 	getch();
