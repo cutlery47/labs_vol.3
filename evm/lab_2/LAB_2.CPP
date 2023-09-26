@@ -1,6 +1,10 @@
 #include <iostream.h>
 #include <conio.h>
 #include <dos.h>
+#include <stdlib.h>
+#include <limits.h>
+
+#define SHORT 16
 
 const char* colname(int color, int mode) {
 	switch(color) {
@@ -101,29 +105,63 @@ const char* colname(int color, int mode) {
 				return "BELIY";
 			}
 	}
+	return 0;
 }
 
 
+union binshort {
+	short s;
+	unsigned short u;
+};
 
+int* serializeShort(short number) {
+	int* ser_arr = (int*)malloc(sizeof(int) * SHORT);
+	int i = 0;
 
+	for (int val = 16384; val > 0; val >>= 1) {
 
-void print(int txtcol, int bgcol, int spaces) {
+		if (number & val) {
+			ser_arr[i] = 1;
+		} else {
+			ser_arr[i] = 0;
+		}
+
+		i += 1;
+	}
+	return ser_arr;
+}
+
+void printShort(int* arr, int size) {
+	for (int i = 0; i < size - 1; ++i) {
+		cprintf("%d", arr[i]);
+	}
+	return;
+}
+
+void print(int txtcol, int bgcol, int spaces, int* bits) {
 	const char* txtname = colname(txtcol, 0);
 	const char* bgname = colname(bgcol, 1);
+
 	//deleting both lines from the top, to perform down scroll
 	gotoxy(1, 1);
 	for (int i = 0; i <= spaces; ++i) {
 		delline();
 	}
-	textcolor(txtcol);
-	textbackground(bgcol);
+
+	//BLINK = 128;
+	textattr(BLINK | bgcol * 16 | txtcol);
 	gotoxy(1, 8);
+
 	//when scrolled, add new data to the bottom
 	for (int j = 0; j <= spaces; ++j) {
 		insline();
 	}
 	gotoxy(1, 8);
-	cprintf("Text: %s, Background: %s", txtname, bgname);
+	printShort(bits, SHORT);
+	gotoxy(1, 9);
+
+	cprintf("Text color: %s, Backgorund color: %s", txtname, bgname);
+	return;
 }
 
 int main() {
@@ -133,14 +171,26 @@ int main() {
 	int S = 2;
 	int max_colors = 16;
 	int max_backgrounds = 8;
+
+	int* arr;
+	union binshort bsh;
+
 	textbackground(BLACK);
 	textcolor(WHITE);
 	clrscr();
+
+	cprintf("Enter a short int (-32768; 16384): ");
+
+	cscanf("%d", &bsh.s);
+	getch();
+
+	arr = serializeShort(bsh.u);
+
 	window(left_x, left_y, right_x, right_y);
+
 	for (int i = 0; i < max_backgrounds; ++i) {
 		for (int j = 0; j < max_colors; ++j)  {
-			print(j, i, S);
-
+			print(j, i, S, arr);
 			if (kbhit()) {
 				return 0;
 			}
@@ -148,9 +198,17 @@ int main() {
 			delay(T);
 		}
 	}
-	getch();
+
 	return 0;
 }
+
+
+
+
+
+
+
+
 
 
 
