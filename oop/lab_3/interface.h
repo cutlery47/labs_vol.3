@@ -6,10 +6,16 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QDebug>
+#include <QRegularExpressionValidator>
+#include <QRegularExpression>
+#include <QValidator>
+
 #include <matrix.h>
+#include <number.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Interface; }
@@ -20,35 +26,42 @@ class Interface : public QWidget
 {
     Q_OBJECT
 
+    // поля ввода значений
     QLineEdit** cells;
+
+    // лэйауты
+    QVBoxLayout* main_layout;
+    QHBoxLayout* upper_layout;
+    QGridLayout* grid_layout;
+    QHBoxLayout* lower_layout;
+
+    // виджеты
     QPushButton* trans_btn;
     QPushButton* det_btn;
     QPushButton* rank_btn;
     QLabel* result;
-    QGridLayout* layout;
     QSpinBox* size_box;
 
-    int height = 300;
-    int width = 200;
-    int expand = 25;
-    int size = 3;
-
+    // объект матрицы
     Matrix* matrix;
 
-    QLineEdit** copy_representation(QLineEdit** repr, int new_size, int old_size);
+    // функции-помощники
+    void updateMatrix();
+    void updateGrid();
+    QString numberToQString(number val);
+    number QStringToNumber(QString val);
+    bool inputIsValid();
 
 public:
     Interface(QWidget *parent = nullptr);
     ~Interface();
 
 
-
-
-
 public slots:
-    void change_size();
-    void update_layout();
-
+    void changeSize();
+    void calcDet();
+    void calcRank();
+    void transpose();
 };
 
 #endif // INTERFACE_H

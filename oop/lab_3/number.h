@@ -2,6 +2,6 @@
 #define NUMBER_H
 #endif // NUMBER_H
 
-#include "complex.h"
+#include "rational.h"
 
-typedef Complex number;
+typedef Rational number;

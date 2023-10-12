@@ -5,57 +5,48 @@
 Interface::Interface(QWidget *parent)
     : QWidget(parent)
 {
-    // creating an instance of matrix
-    matrix = new Matrix(size);
+    // создание объекта матрицы, 3 - размер по умолчанию
+    matrix = new Matrix(3);
 
-    // creating a layout for matrix + resizing
-    layout = new QGridLayout;
-    resize(height + (expand * size * 2), height + (expand * size));
+    main_layout = new QVBoxLayout;
+    upper_layout = new QHBoxLayout;
+    grid_layout = new QGridLayout;
+    lower_layout = new QHBoxLayout;
 
-
-    // allocating for matrix representaion
-    cells = new QLineEdit*[size];
-    for (int i = 0; i < size; ++i) {
-        cells[i] = new QLineEdit[size * 2];
-    }
-
-    for (int i = 0; i < size; ++i) {
-        for (int j = 0; j < 2 * size; ++j) {
-            layout->addWidget(&cells[i][j], i , j);
-        }
-    }
-
-    this->setLayout(layout);
-
-    //buttons and stuff
-    trans_btn = new QPushButton(this);
-    trans_btn->setGeometry(10, height + (expand * size) - 40, 100, 25);
-    trans_btn->setText("Transpose");
-
-    det_btn = new QPushButton(this);
-    det_btn->setGeometry(110, height + (expand * size) - 40, 100, 25);
-    det_btn->setText("Determinant");
-
-    rank_btn = new QPushButton(this);
-    rank_btn->setGeometry(210, height + (expand * size) - 40, 100, 25);
-    rank_btn->setText("Rank");
-
+    result = new QLabel("Result: ");
     size_box = new QSpinBox(this);
-    size_box->setGeometry(10, 10, 50, 25);
-    size_box->setValue(size);
+    size_box->setValue(matrix->size());
     size_box->setMaximum(10);
     size_box->setMinimum(1);
 
-    result = new QLabel("1223", this);
-    result->setGeometry(75, 10, 25, 25);
+    upper_layout->addWidget(size_box);
+    upper_layout->addWidget(result);
 
-    //signals
-    connect(size_box, SIGNAL(valueChanged(int)), this, SLOT(change_size()));
+    updateGrid();
+
+    // приколы
+    trans_btn = new QPushButton("Transpose", this);
+    det_btn = new QPushButton("Determinant", this);
+    rank_btn = new QPushButton("Rank", this);
+
+    lower_layout->addWidget(trans_btn);
+    lower_layout->addWidget(det_btn);
+    lower_layout->addWidget(rank_btn);
+
+    main_layout->addLayout(upper_layout);
+    main_layout->addLayout(grid_layout);
+    main_layout->addLayout(lower_layout);
+
+    this->setLayout(main_layout);
+
+    connect(size_box, SIGNAL(valueChanged(int)), this, SLOT(changeSize()));
+    connect(det_btn, SIGNAL(clicked()), this, SLOT(calcDet()));
+    connect(rank_btn, SIGNAL(clicked()), this, SLOT(calcRank()));
+    connect(trans_btn, SIGNAL(clicked()), this, SLOT(transpose()));
 }
 
-Interface::~Interface()
-{
-    for (int i = 0; i < size; ++i) {
+Interface::~Interface() {
+    for (int i = 0; i < matrix->size(); ++i) {
         delete cells[i];
     }
 
@@ -68,46 +59,132 @@ Interface::~Interface()
     delete matrix;
 }
 
-void Interface::change_size() { 
+void Interface::updateGrid() {
 
-    // deleting current representation to create a new one
-    for (int i = 0; i < size; ++i) {
+    // регулярное выражение для валидации ввода
+    QRegularExpression exp("-?[0-9]*\\/[1-9]+[0-9]*");
+    QRegularExpressionValidator* valid = new QRegularExpressionValidator(exp);
+
+    cells = new QLineEdit*[matrix->size()];
+    for (int i = 0; i < matrix->size(); ++i) {
+        cells[i] = new QLineEdit[matrix->size()];
+    }
+
+    for (int i = 0; i < matrix->size(); ++i) {
+        for (int j = 0; j < matrix->size(); ++j) {
+            cells[i][j].setPlaceholderText("0");
+            cells[i][j].setValidator(valid);
+            grid_layout->addWidget(&cells[i][j], i , j);
+        }
+    }
+
+}
+
+void Interface::changeSize() {
+    for (int i = 0; i < matrix->size(); ++i) {
         delete[] cells[i];
     }
     delete cells;
 
-    // updating size
-    size = size_box->value();
-    matrix->setSize(size);
-    resize(height + (expand * size * 2), height + (expand * size));
+    matrix->setSize(size_box->value());
+    updateGrid();
 
-    // updating representation
-    update_layout();
+    setLayout(main_layout);
 }
 
+QString Interface::numberToQString(number val) {
+    QString res = QString::number(val.getNumerator()) + "/" + QString::number(val.getDenominator());
+    return res;
+}
 
+number Interface::QStringToNumber(QString val) {
+    number tmp;
+    QString str_num;
+    QString str_den;
+    int flag = 0;
 
-void Interface::update_layout() {
-
-    // allocating for updated representation
-    cells = new QLineEdit*[size];
-
-    for (int i = 0; i < size; ++i) {
-        cells[i] = new QLineEdit[size * 2];
-    }
-
-    for (int i = 0; i < size; ++i) {
-        for (int j = 0; j < 2 * size; ++j) {
-            layout->addWidget(&cells[i][j], i , j);
+    for (int i = 0; i < val.size(); ++i) {
+        if (val[i] == '/') {
+            flag = 1;
+        } else {
+            if (flag == 0) {
+                str_num.append(val[i]);
+            } else {
+                str_den.append(val[i]);
+            }
         }
     }
 
-    this->setLayout(layout);
+    //если знаменателя не было при вводе - добавляем единицу
+    if (str_den.size() == 0) {
+        str_den.append('1');
+    }
 
-    trans_btn->setGeometry(10, height + (expand * size) - 40, 100, 25);
-    det_btn->setGeometry(110, height + (expand * size) - 40, 100, 25);
-    rank_btn->setGeometry(210, height + (expand * size) - 40, 100, 25);
-    result->setGeometry(75, 10, 25, 25);
+    tmp.setDenominator(str_den.toInt());
+    tmp.setNumerator(str_num.toInt());
+    return tmp;
+}
+
+void Interface::calcDet() {
+    if (!inputIsValid()) {
+        return;
+    }
+    updateMatrix();
+
+    number det = this->matrix->det();
+    det.simplify();
+
+    QString res = numberToQString(det);
+    this->result->setText("Result: Determinant = " + res);
+}
+
+void Interface::calcRank() {
+    if (!inputIsValid()) {
+        return;
+    }
+    updateMatrix();
+
+    int rank = this->matrix->rank();
+    this->result->setText("Result: Rank = " + QString::number(rank));
+}
+
+void Interface::transpose() {
+    if (!inputIsValid()) {
+        return;
+    }
+
+    updateMatrix();
+    matrix->transpose();
+
+    for (int i = 0; i < matrix->size(); ++i) {
+        for (int j = i; j < matrix->size(); ++j) {
+            cells[i][j].setText(numberToQString(matrix->retrieve(i, j)));
+            cells[j][i].setText(numberToQString(matrix->retrieve(j, i)));
+        }
+    }
+
+    this->setLayout(main_layout);
+}
+
+bool Interface::inputIsValid() {
+    // проверка на совпадение заданной маски ввода
+    for (int i = 0; i < matrix->size(); ++i) {
+        for (int j = 0; j < matrix->size(); ++j) {
+            if (!cells[i][j].hasAcceptableInput()) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+void Interface::updateMatrix() {
+    // обновление внутренней матрицы новыми значениями
+    for (int i = 0; i < matrix->size(); ++i) {
+        for (int j = 0; j < matrix->size(); ++j) {
+            matrix->insert(i, j, QStringToNumber(cells[i][j].text()));
+        }
+    }
 }
 
 

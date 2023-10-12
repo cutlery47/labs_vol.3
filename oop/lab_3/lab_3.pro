@@ -12,13 +12,13 @@ SOURCES += \
     main.cpp \
     interface.cpp \
     matrix.cpp \
-    complex.cpp \
+    rational.cpp
 
 HEADERS += \
     interface.h \
     matrix.h \
-    complex.h \
     number.h \
+    rational.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

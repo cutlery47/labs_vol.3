@@ -54,7 +54,19 @@ void Matrix::print()
 //данный метод задает атрибут matrix_size
 void Matrix::setSize(int size)
 {
-    this->matrix_size = size;
+    wipe();
+    matrix_size = size;
+
+    matrix = new number* [matrix_size];
+    for (int i = 0; i < matrix_size; ++i)
+        matrix[i] = new number [matrix_size];
+
+    //заполнение нулями
+    for (int i = 0; i < matrix_size; ++i) {
+        for (int j = 0; j < matrix_size; ++j) {
+            matrix[i][j] = 0;
+        }
+    }
 }
 
 //геттер для размера матрицы
@@ -158,7 +170,7 @@ int Matrix::rank() {
     //ранг матрицы - размер наибольшего ненулевого минора
     number d = this->det();
 
-    if (d != 0) {
+    if (d != 0 || matrix_size == 1) {
         return matrix_size;
     }
 
@@ -173,6 +185,5 @@ int Matrix::rank() {
         }
     }
 
-    wipe();
     return rnk;
 }
