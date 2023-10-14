@@ -15,7 +15,10 @@ class Client : public QWidget
     Q_OBJECT
 
 private:
+    // объект интерфейса
     Interface* interface;
+
+    // объект коммуникатора (UDP-сокет)
     Communicator* comm;
 
 public:
@@ -23,7 +26,10 @@ public:
     ~Client();
 
 public slots:
+    // слот для получения данных из коммуникатора
     void fromCommunicator(QByteArray data);
+
+    // слот для отправки данных через коммуникатор
     void toCommunicator(QString data);
 };
 
