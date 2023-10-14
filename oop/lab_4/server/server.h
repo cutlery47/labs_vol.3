@@ -10,8 +10,6 @@
 #include <../communicator/communicator.h>
 #include <../communicator/request.h>
 
-
-
 class Server : public QWidget
 
 {
@@ -28,11 +26,8 @@ public:
     ~Server();
 
 public slots:
+    // слот, который срабатывает при приходе запроса
     void respondToRecieved(QByteArray data);
 };
-
-QString numberToQString(number val);
-
-number QStringToNumber(QString val);
 
 #endif // SERVER_H
