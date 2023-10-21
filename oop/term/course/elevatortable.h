@@ -18,9 +18,12 @@ private:
     QHBoxLayout layout;
     int cur_floor = 1;
 
+private slots:
+    void updateElevatorUI(Passenger* pass);
+
 public:
     Elevator* elevator;
-    ElevatorTable(Elevator* elevator);
+    ElevatorTable(QObject *parent = nullptr);
     ~ElevatorTable();
 
 };

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDebug>
+#include <QVector>
 
 #include <passenger.h>
 
@@ -14,14 +15,18 @@ class Elevator: public QObject
 private:
     int max_passengers;
     int curr_floor;
-    int passangers;
-    Passenger* passengers;
+    QVector<Passenger*> passengers;
+
+
 
 public slots:
-    void smth();
+    void addPassenger(Passenger* pass);
+
+signals:
+    void passengerAdded(Passenger* pass);
 
 public:
-    Elevator();
+    Elevator(QObject* parent = nullptr);
     ~Elevator();
 
 };

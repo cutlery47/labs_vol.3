@@ -1,5 +1,4 @@
 #include "elevatorwindow.h"
-#include "panelwindow.h"
 #include <QApplication>
 
 

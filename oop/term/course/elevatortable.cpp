@@ -2,9 +2,11 @@
 #include "elevatortable.h"
 #include <iostream>
 
-ElevatorTable::ElevatorTable(Elevator* elevator)
+ElevatorTable::ElevatorTable(QObject* parent)
 {
-    this->elevator = elevator;
+    this->QObject::setParent(parent);
+
+    this->elevator = new Elevator(this);
 
     this->table.setColumnCount(2);
     this->table.setRowCount(9);
@@ -24,6 +26,13 @@ ElevatorTable::ElevatorTable(Elevator* elevator)
 
     this->layout.addWidget(&(this->table));
     this->setLayout(&(this->layout));
+}
+
+void ElevatorTable::updateElevatorUI(Passenger* pass) {
+    int from = pass->from();
+    QTableWidgetItem item;
+    item.setBackground(Qt::green);
+    this->table.setItem(3, 0, &item);
 }
 
 ElevatorTable::~ElevatorTable() {
