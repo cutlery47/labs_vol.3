@@ -17,22 +17,34 @@ public:
     ElevatorWindow(QWidget *parent = nullptr);
     ~ElevatorWindow();
 
-    ElevatorTable* elevator_1;
-    ElevatorTable* elevator_2;
+    //GUI for elevators
+    ElevatorTable* table_1;
+    ElevatorTable* table_2;
+
+    //Elevators themselves
+    Elevator* elevator_1;
+    Elevator* elevator_2;
 
     int height = 600;
     int width = 800;
 
 private:
-
+    int t;
 
     QHBoxLayout* layout;
     PanelWindow* panel;
     QWidget* main_widget;
 
+    QThread first_thread;
+    QThread second_thread;
+
 private slots:
     void retrievePassenger_1();
     void retrievePassenger_2();
+    void startThread_1();
+    void startThread_2();
+    void finishThread_1();
+    void finishThread_2();
 
 
 

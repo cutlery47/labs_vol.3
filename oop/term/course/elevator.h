@@ -4,30 +4,43 @@
 #include <QObject>
 #include <QDebug>
 #include <QVector>
+#include <QTimer>
+#include <QThread>
 
 #include <passenger.h>
 
+enum elevator_state {
+    idle = 0,
+    moving = 1
+};
 
 class Elevator: public QObject
 {
     Q_OBJECT;
 
-private:
-    int max_passengers;
-    int curr_floor;
-    QVector<Passenger*> passengers;
+    // elevator can quit current thread if needed
+    QThread* parent_thread;
 
+    // attributes
+    int max_passengers;
+    int floor;
+    QVector<Passenger*> passengers;
 
 
 public slots:
     void addPassenger(Passenger* pass);
+    void moveElevator();
 
 signals:
     void passengerAdded(Passenger* pass);
+    void applyTransit(int floor);
+    void stopElevator();
 
 public:
-    Elevator(QObject* parent = nullptr);
+    Elevator(QThread* parent_thread);
     ~Elevator();
+
+    int state = idle;
 
 };
 

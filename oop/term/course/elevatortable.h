@@ -14,16 +14,23 @@ class ElevatorTable : public QWidget
 
 private:
     QTableWidget table;
-    QTableWidgetItem cell;
     QHBoxLayout layout;
+    int height = 9;
+    int width = 2;
     int cur_floor = 1;
 
+
+    void clearCell(int height, int width);
+
 private slots:
-    void updateElevatorUI(Passenger* pass);
+    void updateElevatorPass(Passenger* pass);
+    void updateElevatorFloor(int floor);
+
+
+
 
 public:
-    Elevator* elevator;
-    ElevatorTable(QObject *parent = nullptr);
+    ElevatorTable();
     ~ElevatorTable();
 
 };
