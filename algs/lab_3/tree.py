@@ -8,162 +8,102 @@ class TreeNode:
         self.right = right
         self.val = val
 
-class AVLTreeNode(TreeNode):
-    def __init__(self, val:  int = 0, height: int = 0, left=None, right=None):
-        """ basically the same class besides that height attribute was added """
-
-        super(AVLTreeNode, self).__init__(val, left, right)
-        self.height = height
-
 
 class Tree:
     def __init__(self, string):
         """ creates a tree from input string """
-
-        self.root = parse(string)
+        self.root = self.parse(string)
 
     def traversal(self, mode):
         """ manager for traversal subfunctions """
 
-        self.__dfs(mode, self.root)
+        if mode < 4:
+            self._dfs(mode, self.root)
+        else:
+            self._bfs()
 
-    def __dfs(self, mode: int, node: TreeNode = None):
+    def _dfs(self, mode: int, node: TreeNode = None):
         """ depth-for-search tree traversal"""
 
         if not node:
-            print("null")
+            print("null", end=" ")
             return
 
         # MLR
         if mode == 1:
-            print(node.val)
+            print(node.val, end=" ")
 
-        self.__dfs(mode, node.left)
+        self._dfs(mode, node.left)
 
         #LMR
         if mode == 2:
-            print(node.val)
+            print(node.val, end=" ")
 
-        self.__dfs(mode, node.right)
+        self._dfs(mode, node.right)
 
         #RML
         if mode == 3:
-            print(node.val)
+            print(node.val, end=" ")
 
         return
 
-class AVLTree(Tree):
-    def __init__(self, string):
-        # Array for storing elements of the binary tree given as input
-        self.values = []
-
-        # Value for storing tree height -_-
-        self.tree_height = 0
-
-        # Using default tree constructor to create a non-search binary tree
-        super(AVLTree, self).__init__(string)
-
-        # Collecting elements and sorting
-        self.__buildAVL(self.root)
-        self.values.sort()
-
-        # Calculating AVL tree height
-        self.getAVLHeight(self.root, 0)
-
-        # Building a binary search tree
-        self.root = self.binaryToAVL(self.values, 0)
-
-    def __buildAVL(self, node: TreeNode = None):
-        """ parsing the binary tree from input string --- collecting all the values """
-
-        if not node:
+    def _bfs(self):
+        if not self.root:
             return
 
-        self.values.append(node.val)
-        self.__buildAVL(node.left)
-        self.__buildAVL(node.right)
-        return
+        q = []
 
-    def getAVLHeight(self, node, height):
-        """ going down the tree to calculate its depth """
+        q.append(self.root)
 
-        if not node:
-            self.tree_height = max(self.tree_height, height)
-            return
+        while len(q) != 0:
+            cur_node = q.pop(0)
 
-        self.getAVLHeight(node.left, height + 1)
-        self.getAVLHeight(node.right, height + 1)
-
-        return
-
-    def binaryToAVL(self, nums, height):
-        """ converting input binary tree values to an avl tree """
-
-        if len(nums) == 0:
-            return
-
-        ind = (len(nums) - 1) // 2
-        node = AVLTreeNode(nums[ind], self.tree_height - height)
-
-        node.left = self.binaryToAVL(nums[:ind], height + 1)
-        node.right = self.binaryToAVL(nums[ind + 1:], height + 1)
-
-        return node
-
-    def find(self, value):
-        node = self.root
-
-        while node and value != node.val:
-            if node.val > value:
-                node = node.left
+            if cur_node != "null":
+                print(cur_node.val, end=" ")
             else:
-                node = node.right
+                print("null", end=" ")
+                continue
+
+            if cur_node.left:
+                q.append(cur_node.left)
+
+            if cur_node.right:
+                q.append(cur_node.right)
+
+    def parse(self, tree_string):
+        """ Преобразование строки в бинарное дерево """
+
+        # Ищем центральный элемент дерева (первый в строке)
+        top = tools.findTopElement(tree_string)
+
+        if top:
+            node = TreeNode(top)
+        else:
+            return None
+
+        # Отбрасываем внешние скобки и этот элемент
+        tree_string = tree_string[2:-1]
+
+        # Суть заключается в том, что мы разбиваем исходную строку на подстроки такого же вида, как исходная строка
+        # Таким образом, если представить исходную строку, как бинарное дерево - все меньшие подстроки будут поддеревьями
+
+        # Разбиваем строку на подстроки
+        subtr_arr = tools.findSubtrees(tree_string)
+
+        # Если подстрок нет - возвращаем ноду
+        if len(subtr_arr) == 0:
+            return node
+
+        # Первая подстрока - левое поддерево
+        node.left = self.parse(subtr_arr[0])
+
+        # Вторая подстрока (если есть) - правое поддерево
+        if len(subtr_arr) == 2:
+            node.right = self.parse(subtr_arr[1])
 
         return node
 
-    def insert(self, value):
-        pass
-
-    def delete(self, value):
-        pass
-
-def parse(tree_string):
-    """ Преобразование строки в бинарное дерево """
-
-    # Ищем центральный элемент дерева (первый в строке)
-    top = tools.findTopElement(tree_string)
-
-    if top:
-        node = TreeNode(top)
-    else:
-        return None
-
-    # Отбрасываем внешние скобки и этот элемент
-    tree_string = tree_string[2:-1]
-
-    # Суть заключается в том, что мы разбиваем исходную строку на подстроки такого же вида, как исходная строка
-    # Таким образом, если представить исходную строку, как бинарное дерево - все меньшие подстроки будут поддеревьями
-
-    # Разбиваем строку на подстроки
-    subtr_arr = tools.findSubtrees(tree_string)
-
-    # Если подстрок нет - возвращаем ноду
-    if len(subtr_arr) == 0:
-        return node
-
-    # Первая подстрока - левое поддерево
-    node.left = parse(subtr_arr[0])
-
-    # Вторая подстрока (если есть) - правое поддерево
-    if len(subtr_arr) == 2:
-        node.right = parse(subtr_arr[1])
-
-    return node
 
 
-input_str = "(8(9(5(2)))(1(5)(9)))"
-tools.inputCheck(input_str)
 
-smth = AVLTree(input_str)
-print(smth.find(8))
 
