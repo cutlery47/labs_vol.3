@@ -4,11 +4,10 @@ import tools
 
 
 class AVLTreeNode(TreeNode):
-    def __init__(self, val: int = 0, height: int = 0, left=None, right=None, parent=None):
+    def __init__(self, val: int = 0, height: int = 0, left=None, right=None):
         """ basically the same class besides that height attribute was added """
 
         super(AVLTreeNode, self).__init__(val, left, right)
-        self.parent = parent
         self.height = height
 
 
@@ -42,7 +41,6 @@ class AVLTree(Tree):
         ind = (len(nums) - 1) // 2
         node = AVLTreeNode(nums[ind])
 
-        node.parent = parent
         node.left = self.binaryToAVL(nums[:ind], node)
         node.right = self.binaryToAVL(nums[ind + 1:], node)
 
@@ -96,10 +94,13 @@ class AVLTree(Tree):
 
         return node
 
-    def insert(self, value):
-        if not self.root:
-            return
+    def findReplacement(self, node):
+        if not node or not node.left:
+            return node
+        else:
+            return self.findReplacement(node.left)
 
+    def insert(self, value):
         """ basically an interface for insertValue() function"""
         self.root = self.__insertValue(value, self.root)
         self.tree_height = self.root.height
@@ -115,7 +116,7 @@ class AVLTree(Tree):
             elif value < node.val:
                 node.left = self.__insertValue(value, node.left)
         else:
-            new_node = AVLTreeNode(value, height=1, parent=node)
+            new_node = AVLTreeNode(value, height=1)
             self.values.append(value)
 
             return new_node
@@ -130,32 +131,84 @@ class AVLTree(Tree):
         if diff > 1 and value > node.right.val:
             node = self.leftRotate(node)
 
-        if diff > 1 and value < node.right.val:
+        elif diff > 1 and value < node.right.val:
             node.right = self.rightRotate(node.right)
             node = self.leftRotate(node)
 
-        if diff < -1 and value < node.left.val:
+        elif diff < -1 and value < node.left.val:
             node = self.rightRotate(node)
 
-        if diff < -1 and value > node.left.val:
+        elif diff < -1 and value > node.left.val:
             node.left = self.leftRotate(node.left)
             node = self.rightRotate(node)
 
         return node
 
+    def __deleteValue(self, value, node):
+        if node:
+            if value > node.val:
+                node.right = self.__deleteValue(value, node.right)
+            elif value < node.val:
+                node.left = self.__deleteValue(value, node.left)
+            else:
+                if not node.left:
+                    node = node.right
+                    return node
+                elif not node.right:
+                    node = node.left
+                    return node
+                replacement = self.findReplacement(node.right)
+                node.val = replacement.val
+                node.right = self.__deleteValue(node.right, node.val)
+        else:
+            print("Provided value hasn't been found...")
+            return None
+
+        node.height = 1 + max(tools.getHeight(node.left), tools.getHeight(node.right))
+
+        if node.height < 3:
+            return node
+
+        diff = tools.getHeight(node.right) - tools.getHeight(node.left)
+
+        if diff > 1 and value > node.right.val:
+            node = self.leftRotate(node)
+
+        elif diff > 1 and value < node.right.val:
+            node.right = self.rightRotate(node.right)
+            node = self.leftRotate(node)
+
+        elif diff < -1 and value < node.left.val:
+            node = self.rightRotate(node)
+
+        elif diff < -1 and value > node.left.val:
+            node.left = self.leftRotate(node.left)
+            node = self.rightRotate(node)
+
+        return node
+
+
+
     def delete(self, value):
-        pass
+        self.root = self.__deleteValue(value, self.root)
+        self.tree_height = self.root.height
+
+        print("Updated tree height: " + str(self.tree_height))
 
 
-input_str = "(5)"
+input_str = "(1)"
 tools.inputCheck(input_str)
 
 smth = AVLTree(input_str)
-smth.insert(10)
-smth.insert(2)
-smth.insert(3)
-smth.insert(7)
-smth.insert(9)
 smth.insert(1)
-smth.insert(0)
-print(123)
+smth.insert(10)
+smth.insert(3)
+smth.insert(8)
+smth.insert(2)
+smth.insert(4)
+smth.insert(7)
+smth.insert(6)
+smth.insert(5)
+smth.insert(9)
+smth.delete(10)
+smth.traversal(4)
