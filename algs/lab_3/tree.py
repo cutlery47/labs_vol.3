@@ -14,6 +14,29 @@ class Tree:
         """ creates a tree from input string """
         self.root = self.parse(string)
 
+        # Var for storing the tree height
+        self.tree_height = 1
+
+        # Array for storing elements of the binary tree given as input
+        self.values = []
+
+        # Collecting elements from initial tree
+        self._collectValues(self.root)
+
+        # Calculating AVL tree height
+        self._getTreeHeight(self.root, 0)
+
+    def _collectValues(self, node: TreeNode = None):
+        """ parsing the binary tree from input string --- collecting all the values """
+
+        if not node:
+            return
+
+        self.values.append(node.val)
+        self._collectValues(node.left)
+        self._collectValues(node.right)
+        return
+
     def traversal(self, mode):
         """ manager for traversal subfunctions """
 
@@ -69,6 +92,17 @@ class Tree:
 
             if cur_node.right:
                 q.append(cur_node.right)
+
+    def _getTreeHeight(self, node, height):
+        """ going down the tree to calculate its depth """
+
+        if not node:
+            self.tree_height = max(self.tree_height, height - 1)
+            return
+
+        self._getTreeHeight(node.left, height + 1)
+        self._getTreeHeight(node.right, height + 1)
+        return
 
     def parse(self, tree_string):
         """ Преобразование строки в бинарное дерево """

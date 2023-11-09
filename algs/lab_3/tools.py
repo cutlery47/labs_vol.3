@@ -2,6 +2,8 @@ def inputCheck(tree_string):
     if tree_string.count("(") != tree_string.count(")"):
         raise Exception("Input String Error: Parentheses sequence is not valid")
 
+def getHeight(node):
+    return 0 if not node else node.height
 
 def findSubtrees(tree_string):
     res = []

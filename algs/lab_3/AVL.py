@@ -17,51 +17,19 @@ class AVLTree(Tree):
         # Creating a binary from given data
         super().__init__(string)
 
-        # Array for storing elements of the binary tree given as input
-        self.values = []
-
-        # Value for storing tree height
-        self.tree_height = 0
-
-        # Collecting elements from initial tree
-        self.__collectValues(self.root)
+        # Sorting tree values to convert BST to AVL BST
         self.values.sort()
-
-        # Calculating AVL tree height
-        self.__getAVLHeight(self.root, 0)
 
         # Converting initial tree to AVL
         self.root = self.binaryToAVL(self.values, None)
 
         self.__adjustNodesHeight(self.root, 1)
 
-    def __collectValues(self, node: TreeNode = None):
-        """ parsing the binary tree from input string --- collecting all the values """
-
-        if not node:
-            return
-
-        self.values.append(node.val)
-        self.__collectValues(node.left)
-        self.__collectValues(node.right)
-        return
-
-    def __getAVLHeight(self, node, height):
-        """ going down the tree to calculate its depth """
-
-        if not node:
-            self.tree_height = max(self.tree_height, height)
-            return
-
-        self.__getAVLHeight(node.left, height + 1)
-        self.__getAVLHeight(node.right, height + 1)
-        return
-
     def __adjustNodesHeight(self, node, height):
         if not node:
             return
 
-        node.height = height
+        node.height = self.tree_height - height + 1
         self.__adjustNodesHeight(node.left, height + 1)
         self.__adjustNodesHeight(node.right, height + 1)
 
@@ -95,8 +63,8 @@ class AVLTree(Tree):
         new_peak.left = peak
         peak.right = l_subroot
 
-        peak.height = 1 + max(peak.left.height, peak.right.height)
-        new_peak.height = 1 + max(new_peak.left.height, new_peak.right.height)
+        peak.height = 1 + max(tools.getHeight(peak.left), tools.getHeight(peak.right))
+        new_peak.height = 1 + max(tools.getHeight(new_peak.left), tools.getHeight(new_peak.right))
 
         return new_peak
 
@@ -107,8 +75,8 @@ class AVLTree(Tree):
         new_peak.right = peak
         peak.left = r_subroot
 
-        peak.height = 1 + max(peak.left.height, peak.right.height)
-        new_peak.height = 1 + max(new_peak.left.height, new_peak.right.height)
+        peak.height = 1 + max(tools.getHeight(peak.left), tools.getHeight(peak.right))
+        new_peak.height = 1 + max(tools.getHeight(new_peak.left), tools.getHeight(new_peak.right))
 
         return new_peak
 
@@ -133,50 +101,61 @@ class AVLTree(Tree):
             return
 
         """ basically an interface for insertValue() function"""
-        self.__insertValue(value, self.root)
+        self.root = self.__insertValue(value, self.root)
+        self.tree_height = self.root.height
+
+        print("Value successfully inserted!")
+        print("Updated tree height: " + str(self.tree_height))
 
     def __insertValue(self, value, node):
         # finding the parent node of the inserted one
-        if node.left or node.right:
+        if node:
             if value > node.val:
-                self.__insertValue(value, node.right)
-            elif value > node.val:
-                self.__insertValue(value, node.left)
+                node.right = self.__insertValue(value, node.right)
+            elif value < node.val:
+                node.left = self.__insertValue(value, node.left)
         else:
-            new_node = AVLTreeNode(value, height=node.height + 1, parent=node)
-            self.tree_height += 1
+            new_node = AVLTreeNode(value, height=1, parent=node)
+            self.values.append(value)
 
-            if value < node.val:
-                node.left = new_node
-            else:
-                node.right = new_node
+            return new_node
 
-        node.height += 1
+        node.height = 1 + max(tools.getHeight(node.left), tools.getHeight(node.right))
 
-        if not (node.left and node.right) or (self.tree_height - node.height) < 2:
-            return
+        if node.height < 3:
+            return node
 
-        diff = node.right.height - node.left.height
+        diff = tools.getHeight(node.right) - tools.getHeight(node.left)
 
-        if diff > 2 and value > node.right.val:
+        if diff > 1 and value > node.right.val:
             node = self.leftRotate(node)
 
-        if diff > 2 and value < node.right.val:
-            node.left = self.leftRotate(node)
+        if diff > 1 and value < node.right.val:
+            node.right = self.rightRotate(node.right)
+            node = self.leftRotate(node)
+
+        if diff < -1 and value < node.left.val:
             node = self.rightRotate(node)
 
-        if diff < 2 and value < node.right.val:
-            node.right = self.rightRotate(node)
-            node = self.leftRotate(node)
+        if diff < -1 and value > node.left.val:
+            node.left = self.leftRotate(node.left)
+            node = self.rightRotate(node)
 
-        return
+        return node
 
     def delete(self, value):
         pass
 
 
-input_str = "(5(3(2(1)(4))))"
+input_str = "(5)"
 tools.inputCheck(input_str)
 
 smth = AVLTree(input_str)
-print(smth.insert(10))
+smth.insert(10)
+smth.insert(2)
+smth.insert(3)
+smth.insert(7)
+smth.insert(9)
+smth.insert(1)
+smth.insert(0)
+print(123)
