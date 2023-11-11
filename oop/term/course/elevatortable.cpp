@@ -4,7 +4,7 @@
 
 ElevatorTable::ElevatorTable()
 {
-    // setting up the table
+    // значения по умолчанию
     this->table.setColumnCount(width);
     this->table.setRowCount(height);
     this->table.setHorizontalHeaderLabels({"Direction", "Passengers"});
@@ -19,11 +19,10 @@ ElevatorTable::ElevatorTable()
         }
     }
 
-    // setting up the default cell
+    // устанавливаем текущую клетку
     this->table.item(height - 1, 0)->setBackground(Qt::green);
-    this->table.item(height - 1, 0)->setText("↑");
+    this->table.item(height - 1, 0)->setText("-");
 
-    // something
     this->table.resizeColumnsToContents();
     this->table.horizontalHeader()->setStretchLastSection(true);
     this->table.verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -32,7 +31,7 @@ ElevatorTable::ElevatorTable()
     this->setLayout(&(this->layout));
 }
 
-// updating gui when a new passenger has been added
+// обновляем UI при добавлении пассажира
 void ElevatorTable::updateElevatorPass(Passenger* pass) {
     int from = pass->from();
     int to = pass->to();
@@ -47,20 +46,35 @@ void ElevatorTable::updateElevatorPass(Passenger* pass) {
 
 }
 
-// erasing cell space
+// обновляем UI при удалении пассажира
+void ElevatorTable::updateBoardedPass(int floor) {
+    this->table.item(height - floor, 1)->setText("");
+}
+
+// стираем клетку
 void ElevatorTable::clearCell(int height, int width) {
     this->table.item(height, width)->setText("");
     this->table.item(height, width)->setBackground(Qt::white);
 
 }
 
-// updating current cell gui
+// обновляем текущую клетку
 void ElevatorTable::updateElevatorFloor(int floor) {
-    clearCell(height - cur_floor, 0);
+    QString arrow;
+
+    if (floor > cur_floor) {
+        arrow = "↑";
+    } else if (floor < cur_floor) {
+        arrow = "↓";
+    } else {
+        arrow = "-";
+    }
+
+    clearCell(height - cur_floor, 0); 
     this->cur_floor = floor;
 
     this->table.item(height - cur_floor, 0)->setBackground(Qt::green);
-    this->table.item(height - cur_floor, 0)->setText("↑");
+    this->table.item(height - cur_floor, 0)->setText(arrow);
 
 }
 

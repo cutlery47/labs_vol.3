@@ -31,6 +31,7 @@ public:
     QSpinBox* to_box_2;
 
 private:
+    // праметры панели
     int height = 200;
     int width = 600;
     int expand = 100;

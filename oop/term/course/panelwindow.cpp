@@ -27,7 +27,6 @@ PanelWindow::PanelWindow(QWidget *parent) :QDialog(parent)
     this->from_box_2 = new QSpinBox;
     this->from_box_1->setMaximum(9);
     this->from_box_1->setMinimum(1);
-
     this->from_box_2->setMaximum(9);
     this->from_box_2->setMinimum(1);
 
@@ -35,7 +34,6 @@ PanelWindow::PanelWindow(QWidget *parent) :QDialog(parent)
     this->to_box_2 = new QSpinBox;
     this->to_box_1->setMaximum(9);
     this->to_box_1->setMinimum(1);
-
     this->to_box_2->setMaximum(9);
     this->to_box_2->setMinimum(1);
 

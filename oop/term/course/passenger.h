@@ -8,17 +8,17 @@
 class Passenger
 {
 private:
+    // этаж, на котором ожидает пассажир
     int from_floor;
+    // этаж, на который пассажир хочет переместиться
     int to_floor;
-    int elevator_num;
 
 public:
     Passenger();
-    Passenger(int from, int to, int num);
+    Passenger(int from, int to);
 
     int to();
     int from();
-    int elevator();
 };
 
 #endif // PASSENGER_H
