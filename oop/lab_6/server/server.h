@@ -1,4 +1,3 @@
-
 #ifndef SERVER_H
 #define SERVER_H
 
@@ -6,17 +5,16 @@
 #include <QWidget>
 
 #include <squarematrix.h>
-#include <number.h>
-#include <../communicator/communicator.h>
-#include <../communicator/request.h>
+#include <rational.h>
+#include <real.h>
+#include <complex.h>
+
+
 
 class Server : public QWidget
 
 {
     Q_OBJECT
-
-    //сама матрица
-    SquareMatrix* matrix;
 
     //коммуникатор
     Communicator* comm;

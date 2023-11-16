@@ -127,7 +127,7 @@ request decodeRequest(QString request_data) {
     }
 
     req.header = QString(str_header).toInt();
-    req.type = QString(str_header).toInt();
+    req.type = QString(str_type).toInt();
     req.matrix_size = QString(str_size).toInt();
     req.matrix_values = str_values;
 

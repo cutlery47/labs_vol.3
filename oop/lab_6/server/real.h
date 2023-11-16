@@ -1,7 +1,7 @@
-
 #ifndef REAL_H
 #define REAL_H
 
+#include <QString>
 
 class Real {
 
@@ -9,7 +9,9 @@ class Real {
 
 public:
     Real();
-    Real(double val);
+    Real(const double&);
+    Real(const Real&);
+    Real(QString str);
 
     // модуль
     Real abs();
@@ -20,6 +22,10 @@ public:
     Real operator*(Real num);
     Real operator/(Real num);
 
+    double value();
+
+    QString toQString();
+
     // опреации сравнения
     bool operator==(Real num);
     bool operator!=(Real num);
@@ -27,7 +33,7 @@ public:
     bool operator<(Real num);
 
     // операция присваивания + смены знака
-    Real operator=(Real num);
+    void operator=(Real num);
     Real operator-();
 
 };

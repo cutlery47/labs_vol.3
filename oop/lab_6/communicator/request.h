@@ -20,9 +20,9 @@ enum headers {
 
 // типы данных
 enum types {
-    COMPLEX_NUM = 0,
+    RATIONAL_NUM = 0,
     REAL_NUM = 1,
-    RATIONAL_NUM = 2,
+    COMPLEX_NUM = 2,
 };
 
 // каждый запрос содержит хэдер и данные матрицы

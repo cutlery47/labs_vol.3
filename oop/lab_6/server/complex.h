@@ -1,6 +1,7 @@
 #ifndef COMPLEX_H
 #define COMPLEX_H
 #include <iostream>
+#include <QString>
 
 class Complex
 {
@@ -12,12 +13,17 @@ private:
 public:
     Complex();
     Complex(const double&);
+    Complex(QString str);
 
     double getReal();
     double getImag();
 
+    int abs();
+
     void setReal();
     void setImag();
+
+    QString toQString();
 
     //перегружаем операторы c++
     //операторы ввода-вывода
@@ -36,6 +42,9 @@ public:
     //операции сравнения
     bool operator == (Complex);
     bool operator != (Complex);
+
+    void operator = (QString);
+    void operator = (int);
 };
 
 #endif // COMPLEX_H

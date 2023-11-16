@@ -5,6 +5,24 @@ Complex::Complex()
 
 }
 
+Complex::Complex(const double& val) {
+    this->real = val;
+    this->imag = 0;
+}
+
+Complex::Complex(QString str) {
+    QString real_str;
+    QString imag_str;
+    str.chop(1);
+    int index = str.indexOf('+');
+
+    real_str = str.left(index + 1);
+    imag_str = str.right(str.length() - index);
+
+    this->real = real_str.toDouble();
+    this->imag = imag_str.toDouble();
+}
+
 double Complex::getReal() {
     return real;
 }
@@ -13,9 +31,13 @@ double Complex::getImag() {
     return imag;
 }
 
-Complex::Complex(const double& val) {
-    real = val;
-    imag = 0;
+QString Complex::toQString() {
+    return QString::number(this->real) + " + " + QString::number(this->imag) + "i";
+}
+
+
+int Complex::abs() {
+    return (this->real * this->real + this->imag * this->imag);
 }
 
 std::ostream& operator << (std::ostream& os, Complex val) {
@@ -78,3 +100,22 @@ Complex Complex::operator - () {
     tmp.imag = -imag;
     return tmp;
 }
+
+void Complex::operator=(QString str) {
+    QString real_str;
+    QString imag_str;
+    str.chop(1);
+    int index = str.indexOf('+');
+
+    real_str = str.left(index);
+    imag_str = str.right(str.length() - index - 1);
+
+    this->real = real_str.toDouble();
+    this->imag = imag_str.toDouble();
+}
+
+void Complex::operator=(int num) {
+    this->real = num;
+    this->imag = 0;
+}
+

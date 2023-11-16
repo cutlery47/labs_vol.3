@@ -1,6 +1,7 @@
 #ifndef RATIONAL_H
 #define RATIONAL_H
 #include <iostream>
+#include <QString>
 
 class Rational
 {
@@ -13,6 +14,7 @@ public:
     //конструкторы класса
     Rational();
     Rational(const int&);
+    Rational(QString str);
 
     // геттер для числителя
     int getNumerator();
@@ -23,11 +25,14 @@ public:
     // сеттер для знаменателя
     void setDenominator(int val);
 
+    // преобразует число в строку
+    QString toQString();
+
     // получение НОД
     int getGCD(Rational val);
 
     //упрощение числа
-    void simplify();
+    Rational simplify();
 
     //перегружаем операторы c++
     //операторы ввода-вывода

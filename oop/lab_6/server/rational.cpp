@@ -11,6 +11,32 @@ Rational::Rational(const int& val) {
     denominator = 1;
 }
 
+Rational::Rational(QString str) {
+    QString str_num;
+    QString str_den;
+    int flag = 0;
+
+    for (int i = 0; i < str.size(); ++i) {
+        if (str[i] == '/') {
+            flag = 1;
+        } else {
+            if (flag == 0) {
+                str_num.append(str[i]);
+            } else {
+                str_den.append(str[i]);
+            }
+        }
+    }
+
+    // если знаменателя не было при вводе - добавляем единицу
+    if (str_den.size() == 0) {
+        str_den.append('1');
+    }
+
+    this->setDenominator(str_den.toInt());
+    this->setNumerator(str_num.toInt());
+}
+
 int Rational::getNumerator() {
     return numerator;
 }
@@ -25,6 +51,10 @@ void Rational::setNumerator(int val) {
 
 void Rational::setDenominator(int val) {
     denominator = val;
+}
+
+QString Rational::toQString() {
+    return QString::number(this->numerator) + "/" + QString::number(this->denominator);
 }
 
 int Rational::getGCD(Rational val) {
@@ -46,7 +76,7 @@ int Rational::getGCD(Rational val) {
     return gcd;
 }
 
-void Rational::simplify()
+Rational Rational::simplify()
 {
     //сначала знаки
     if(this->denominator < 0)
@@ -64,6 +94,8 @@ void Rational::simplify()
             this->denominator /= i;
         }
     }
+
+    return *this;
 }
 
 std::ostream& operator << (std::ostream& os, Rational val) {
