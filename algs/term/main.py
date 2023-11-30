@@ -20,5 +20,8 @@ print(graph.incident)
 print("bfs")
 graph.dfs(0)
 
+print("bfs")
+graph.dfs(1)
+
 print("dfs")
 graph.bfs(0)
