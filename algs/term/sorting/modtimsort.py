@@ -13,11 +13,11 @@ def getMinrun(arr: ArrayList):
         n //= 2
     return n + r
 
-def binarySearch(arr, l, r, key):
+def binarySearch(arr:ArrayList, l, r, val, key):
     """ Meh """
 
     if l == r:
-        if arr[l] > key:
+        if arr[l][key] > val:
             return l
         else:
             return l + 1
@@ -25,22 +25,21 @@ def binarySearch(arr, l, r, key):
         return l
     else:
         m = (l + r) // 2
-        if arr[m] > key:
-            return binarySearch(arr, l, m - 1, key)
-        elif arr[m] < key:
-            return binarySearch(arr, m + 1, r, key)
+        if arr[m][key] > val:
+            return binarySearch(arr, l, m - 1, val, key)
+        elif arr[m][key] < val:
+            return binarySearch(arr, m + 1, r, val, key)
         else:
             return m
 
-def binaryInsertionSort(arr: ArrayList):
+def binaryInsertionSort(arr: ArrayList, key):
     """ Sorting sub-arrays (used when adjusting runs) """
 
     if len(arr) <= 1:
         return arr
 
-    # using binary search to find insertion index
     for i in range(1, len(arr)):
-        index = binarySearch(arr, 0, i - 1, arr[i])
+        index = binarySearch(arr, 0, i - 1, arr[i][key], key)
         if index != i:
             arr.insert(index, arr[i])
             arr.remove(i + 1)
@@ -51,9 +50,9 @@ def reverse(arr: ArrayList):
     """ Busta Nutt"""
 
     for i in range(0, len(arr) // 2):
-        arr[i], arr[len(arr) - i - 1] = arr[len(arr) - i - 1], arr[i]
+        arr[i], arr[len(arr) - i -1] = arr[len(arr) - i - 1], arr[i]
 
-def merge(left: ArrayList, right: ArrayList) -> ArrayList:
+def merge(left: ArrayList, right: ArrayList, key) -> ArrayList:
     """ Merging two given sub-arrays """
 
     l = 0
@@ -61,7 +60,7 @@ def merge(left: ArrayList, right: ArrayList) -> ArrayList:
     res = ArrayList()
 
     while l < len(left) and r < len(right):
-            if l < len(left) and left[l] < right[r]:
+            if l < len(left) and left[l][key] < right[r][key]:
                 res.push(left[l])
                 l += 1
             else:
@@ -79,55 +78,47 @@ def merge(left: ArrayList, right: ArrayList) -> ArrayList:
 
     return res
 
-def mergeSort(arr: ArrayList) -> ArrayList:
+def mergeSort(arr: ArrayList, key) -> ArrayList:
     """ Sorting by dividing current array on sub-arrays (then merging) """
 
     if len(arr) == 1:
         return arr
 
-    left = mergeSort(arr[:len(arr) // 2])
-    right = mergeSort(arr[len(arr) // 2:])
-    return merge(left, right)
+    left = mergeSort(arr[:len(arr) // 2], key)
+    right = mergeSort(arr[len(arr) // 2:], key)
+    return merge(left, right, key)
 
-def timsort(arr: ArrayList) -> ArrayList:
+def modtimsort(arr: ArrayList, key) -> ArrayList:
     """ The man himself """
 
     minrun = getMinrun(arr)
 
-    # array for returning the result
     res = ArrayList()
 
-    # storage for runs
     runs = ArrayList()
 
-    # array for storing current run
     run = ArrayList()
 
-    # dividing input array on runs
     i = 0
     while i <= len(arr):
-        # by default, the first pair of elements is pushed
-        # simply because two random elements are always arranged in some orde
         if len(run) < 2:
             run.push(arr[i])
             i += 1
             continue
 
-        # current run ordering storage
-        order = run[-1] - run[-2]
+        order = run[-1][key] - run[-2][key]
 
-        # if current element ruins ordering - end current run
-        if i >= len(arr) or (arr[i] >= run[-1] and order < 0) or (arr[i] < run[-1] and order >= 0):
+        if i >= len(arr) or (arr[i][key] >= run[-1][key] and order < 0) or (arr[i][key] < run[-1][key] and order >= 0):
             if len(run) < minrun:
                 # if current run len is less than minrun -- fill current run till len == minrun
                 if i + minrun < len(arr):
                     for j in range(i, i + minrun):
-                        run.push(arr[i])
+                        run.push(arr[j])
                 else:
                     for j in range(i, len(arr)):
-                        run.push(arr[i])
+                        run.push(arr[j])
                 # hence gotta sort the shie
-                run = binaryInsertionSort(run)
+                run = binaryInsertionSort(run, key)
                 i += minrun
             elif len(run) >= minrun and order < 0:
                 # if all good but the ordering was reversed -- reverse current run
@@ -143,27 +134,28 @@ def timsort(arr: ArrayList) -> ArrayList:
 
         i += 1
 
-    while len(runs) > 0:
-        if len(runs) == 1:
-            res = runs.pop()
-        elif len(runs) == 2:
-            res = merge(runs.pop(), runs.pop())
-        else:
-            x = runs.pop()
-            y = runs.pop()
-            z = runs.pop()
-
-            if not (len(x) > len(y) + len(z)) or not (len(y) > len(z)):
-                if len(x) >= len(z):
-                    z = merge(z, y)
-                else:
-                    x = merge(x, y)
-
-                runs.push(z)
-                runs.push(x)
+        while len(runs) > 0:
+            if len(runs) == 1:
+                res = runs.pop()
+            elif len(runs) == 2:
+                res = merge(runs.pop(), runs.pop(), key)
             else:
-                runs.push(z)
-                runs.push(y)
-                runs.push(x)
+                x = runs.pop()
+                y = runs.pop()
+                z = runs.pop()
+
+                if not (len(x) > len(y) + len(z)) or not (len(y) > len(z)):
+                    if len(x) >= len(z):
+                        z = merge(z, y, key)
+                    else:
+                        x = merge(x, y, key)
+
+                    runs.push(z)
+                    runs.push(x)
+                else:
+                    runs.push(z)
+                    runs.push(y)
+                    runs.push(x)
 
     return res
+

@@ -1,5 +1,6 @@
 from tools import tools
 from structures.graph import Graph
+from structures.hashmap import Hashmap
 
 # текстовый файл состоит из двух частей
 # первая - перечисление вершин
@@ -14,14 +15,6 @@ adjacency_matrix = tools.parseData(data)
 
 graph = Graph(adjacency_matrix, edges)
 
-print(graph.list)
-print(graph.incident)
-
-print("bfs")
-graph.dfs(0)
-
-print("bfs")
-graph.dfs(1)
-
-print("dfs")
-graph.bfs(0)
+path, path_len = graph.Kruskal()
+print(path)
+print(path_len)

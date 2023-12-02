@@ -1,3 +1,6 @@
+from sorting.modtimsort import modtimsort
+from structures.disjointset import DisjointSet
+from structures.arraylist import ArrayList
 from tools import tools
 
 class Graph:
@@ -10,93 +13,71 @@ class Graph:
         self.incident = self.fromAdjToIncident()
 
     # преобразование матрицы смежности в список смежности
-    def fromAdjToList(self):
-        adj_list = {}
+    def fromAdjToList(self) -> ArrayList:
+        edges = ArrayList()
         for i in range(len(self.matrix)):
             for j in range(len(self.matrix[i])):
                 if self.matrix[i][j] != 0:
-                    adj_list[self.vertices[i]] = adj_list.get(self.vertices[i], "") + str(self.vertices[j]) + ":" + str(self.matrix[i][j]) + " "
+                    edge = ArrayList()
+                    edge.push(self.vertices[i])
+                    edge.push(self.vertices[j])
+                    edge.push(self.matrix[i][j])
+                    edges.push(edge)
 
-        return adj_list
+        return edges
 
     # преобразование матрицы смежности в матрицу инцидентности
-    def fromAdjToIncident(self):
-        incid = [[0 for i in range(len(self.vertices))]]
+    def fromAdjToIncident(self) -> ArrayList():
+        incid = ArrayList(tools.fill(0, len(self.vertices)))
+
         edge = 0
 
         for i in range(len(self.matrix)):
             for j in range(i, len(self.matrix[i])):
                 if self.matrix[i][j] != 0:
-                    incid.append([0 for i in range(len(self.vertices))])
+                    incid.push(tools.fill(0, len(self.vertices)))
                     incid[edge][j] = self.matrix[i][j]
                     edge += 1
 
         return incid[:-1]
 
-
     def Kruskal(self):
-        # число вершин, котрые нужно пройти (все вершины)
-        # копия матрицы, чтобы не засирать оригинал
-        target = len(self.vertices)
-        tmp_matrix = self.matrix.copy()
-
-        # счетчик посещенных верщин
-        # множество посещенных вершин, чтобы проверять, что ребро образует зацикленность
-        num_visited = 1
-        visited = set()
-
         # матрица для хранения маршрута
         # переменная для хранения длины маршрута
-        path = []
+        path = ArrayList()
         path_len = 0
 
-        # пока не пройдем все вершины
-        while num_visited < target:
-            edge_found = False
-            # длина минимального ребра
-            min_len = 0
-            # координаты минимального ребра в матрице смежности
-            min_j = -1
-            min_i = -1
+        # создаем матрицу с отсортированными по весу кортежами ребер (начало, конец, вес)
+        edges = modtimsort(self.list, 2)
 
-            # пока не найдем минимальное хорошее ребро (не образующее зацикленность)
-            while not edge_found:
-                # находим претендента на минимальное ребро
-                (min_len, min_j, min_i) = tools.findMinEdge(tmp_matrix)
+        set = DisjointSet()
 
-                i_visited = self.vertices[min_i] in visited
-                j_visited = self.vertices[min_j] in visited
+        for edge in edges:
+            set.create(edge[0])
+            set.create(edge[1])
 
-                # если образуется цикл (смежные вершины посещены) - ищем заново
-                if i_visited and j_visited:
-                    tmp_matrix[min_i][min_j] = -1
-                else:
-                    # иначе все круто
-                    edge_found = True
+        for edge in edges:
+            if set.rank[edge[0]] == len(self.vertices) - 1 or set.rank[edge[1]] == len(self.vertices) - 1:
+                break
 
-                    tmp_matrix[min_i][min_j] = -1
+            if set.find(edge[0]) != set.find(edge[1]):
+                node = ArrayList()
+                node.push(edge[0])
+                node.push(edge[1])
 
-                    # добавляем смежные вершины в множество вершин
-                    if not i_visited:
-                        visited.add(self.vertices[min_i])
+                path.push(node)
 
-                    if not j_visited:
-                        visited.add(self.vertices[min_j])
+                set.union(edge[0], edge[1])
+                path_len += edge[2]
 
-            # прибавляем длину пути и добавляем ребро
-            num_visited += 1
-            path_len += min_len
-            path.append(self.vertices[min_i] + self.vertices[min_j])
-
-        print(*path)
-        print(path_len)
+        return (path, path_len)
 
     # обход в глубину по матрице смежности (рекурсивно)
     # входные данные: текущая вершина, массив посещенных вершин
     def dfs(self, curr, visited=None):
         # массив для проверки посещенности вершин
         if not visited:
-            visited = [False] * len(self.vertices)
+            visited = tools.fill(False, len(self.vertices))
 
         # помечаем текущую вершину
         visited[curr] = True
@@ -111,10 +92,10 @@ class Graph:
     # обход в щирину по матрице смежности
     def bfs(self, curr):
         # массив для проверки посещенности вершин
-        visited = [False] * len(self.vertices)
+        visited = tools.fill(False, len(self.vertices))
 
         # очередь для хранения вершин
-        q = [curr]
+        q = ArrayList(curr)
 
         # помечаем посещенную вершину
         visited[curr] = True
@@ -122,15 +103,12 @@ class Graph:
         # пока есть элементы в очереди
         while q:
             vis = q[0]
-            q.pop(0)
+            q.pop_front()
 
             print(self.vertices[vis])
 
             for i in range(len(self.vertices)):
                 if self.matrix[vis][i] != 0 and not visited[i]:
                     # добавляем в очередь всех соседей текущей вершины
-                    q.append(i)
+                    q.push(i)
                     visited[i] = True
-
-
-
